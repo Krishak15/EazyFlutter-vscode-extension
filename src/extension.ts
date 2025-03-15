@@ -17,9 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
     "consumerWrapper.wrapWithConsumer",
     async (document: vscode.TextDocument, range: vscode.Range) => {
       const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        return;
-      }
+      if (!editor) return;
 
       let selectedText = editor.document.getText(editor.selection);
 
@@ -47,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
       const camelCaseProviderName = convertToCamelCase(providerName);
 
       // Wrap the widget
-      const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n  child: Consumer<${providerName}>(\n    builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
+      const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
 
       editor.edit((editBuilder) => {
         editBuilder.replace(
