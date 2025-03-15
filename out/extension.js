@@ -45,9 +45,8 @@ function activate(context) {
     // Register the command for wrapping with Consumer
     const disposable = vscode.commands.registerCommand("consumerWrapper.wrapWithConsumer", async (document, range) => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor) {
+        if (!editor)
             return;
-        }
         let selectedText = editor.document.getText(editor.selection);
         // If no explicit selection, use the hovered range
         if (!selectedText && range) {
@@ -68,7 +67,7 @@ function activate(context) {
         }
         const camelCaseProviderName = convertToCamelCase(providerName);
         // Wrap the widget
-        const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n  child: Consumer<${providerName}>(\n    builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
+        const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
         editor.edit((editBuilder) => {
             editBuilder.replace(editor.selection.isEmpty ? range : editor.selection, wrappedText);
         });
