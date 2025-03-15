@@ -1,0 +1,84 @@
+{
+  "Wrap with Consumer (Any Provider)": {
+    "prefix": "wrapConsumer",
+    "body": [
+      "Consumer<${1:ProviderType}>(",
+      "  builder: (context, ${2:provider}, _) {",
+      "    return ${3:ChildWidget}();",
+      "  },",
+      ")"
+    ],
+    "description": "Wrap a widget with Consumer<T> where T is any provider"
+  },
+
+  "String Getter and Setter": {
+    "prefix": "getsetString",
+    "body": [
+      "String? _${1:variable};",
+      "",
+      "String? get ${1:variable} => _${1:variable};",
+      "set ${1:variable}(String? value) {",
+      "    _${1:variable} = value;",
+      "    notifyListeners();",
+      "}",
+      "$0"
+    ],
+    "description": "Creates a `String` getter and setter for a provider variable"
+  },
+  "Bool Getter and Setter": {
+    "prefix": "getsetBool",
+    "body": [
+      "bool? _${1:variable};",
+      "",
+      "bool? get ${1:variable} => _${1:variable};",
+      "set ${1:variable}(bool? value) {",
+      "    _${1:variable} = value;",
+      "    notifyListeners();",
+      "}",
+      "$0"
+    ],
+    "description": "Creates a `bool` getter and setter for a provider variable"
+  },
+  "Int Getter and Setter": {
+    "prefix": "getsetInt",
+    "body": [
+      "int? _${1:variable};",
+      "",
+      "int? get ${1:variable} => _${1:variable};",
+      "set ${1:variable}(int? value) {",
+      "    _${1:variable} = value;",
+      "    notifyListeners();",
+      "}",
+      "$0"
+    ],
+    "description": "Creates an `int` getter and setter for a provider variable"
+  },
+  "Double Getter and Setter": {
+    "prefix": "getsetDouble",
+    "body": [
+      "double? _${1:variable};",
+      "",
+      "double? get ${1:variable} => _${1:variable};",
+      "set ${1:variable}(double? value) {",
+      "    _${1:variable} = value;",
+      "    notifyListeners();",
+      "}",
+      "$0"
+    ],
+    "description": "Creates a `double` getter and setter for a provider variable"
+  },
+  "List Getter and Setter": {
+    "prefix": "getsetList",
+    "body": [
+      "List<${2:dynamic}> _${1:variable} = [];",
+      "",
+      "List<${2:dynamic}> get ${1:variable} => _${1:variable};",
+      "set ${1:variable}(List<${2:dynamic}> value) {",
+      "    _${1:variable} = value;",
+      "    notifyListeners();",
+      "}",
+      "$0"
+    ],
+    "description": "Creates a `List<T>` getter and setter for a provider variable"
+  }
+}

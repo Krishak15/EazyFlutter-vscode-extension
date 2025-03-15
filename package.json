@@ -1,14 +1,15 @@
 {
   "name": "eazyflutter",
-  "displayName": "eazyflutter",
+  "displayName": "Eazy Flutter",
   "description": "Flutter wrappers ",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.98.0"
   },
-  "categories": [
-    "Other"
-  ],
+ "categories": ["Snippets", "Other"],
+
+
+
   "activationEvents": [
   "onLanguage:dart"
 ],
@@ -20,6 +21,13 @@
         "command": "consumerWrapper.wrapWithConsumer",
         "title": "Wrap with Consumer<T>"
     }
+  
+    ],
+    "snippets": [
+      {
+        "language": "dart",
+        "path": "./snippets/dart-snippets.json"
+      }
     ]
   },
   "codeActions": [
