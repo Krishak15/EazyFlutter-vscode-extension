@@ -36,19 +36,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const child_process_1 = require("child_process");
+const { generate } = require("json-to-dart");
 function activate(context) {
-    // Register Quick Fix for Dart files
+    // Register Wrap with Consumer Quick Fix
     const provider = vscode.languages.registerCodeActionsProvider("dart", new WrapWithConsumerProvider(), {
         providedCodeActionKinds: [vscode.CodeActionKind.Refactor],
     });
     context.subscriptions.push(provider);
-    // Register the command for wrapping with Consumer
-    const disposable = vscode.commands.registerCommand("consumerWrapper.wrapWithConsumer", async (document, range) => {
+    // Command for wrapping with Consumer
+    const consumerCommand = vscode.commands.registerCommand("consumerWrapper.wrapWithConsumer", async (document, range) => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor)
+        if (!editor) {
             return;
+        }
         let selectedText = editor.document.getText(editor.selection);
-        // If no explicit selection, use the hovered range
         if (!selectedText && range) {
             selectedText = document.getText(range);
         }
@@ -56,7 +60,7 @@ function activate(context) {
             vscode.window.showErrorMessage("No widget selected.");
             return;
         }
-        // Ask user for the Provider type
+        // Ask for Provider type
         const providerName = await vscode.window.showInputBox({
             prompt: "Enter Provider Type (e.g., AppUserManagementProvider)",
             placeHolder: "ProviderType",
@@ -66,13 +70,88 @@ function activate(context) {
             return;
         }
         const camelCaseProviderName = convertToCamelCase(providerName);
-        // Wrap the widget
         const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
         editor.edit((editBuilder) => {
             editBuilder.replace(editor.selection.isEmpty ? range : editor.selection, wrappedText);
         });
     });
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(consumerCommand);
+    // Register JSON to Dart command (using json-to-dart QuickType)
+    const jsonToDartCommand = vscode.commands.registerCommand("jsonToDart.generateModel", async () => {
+        try {
+            const jsonInput = await vscode.window.showInputBox({
+                prompt: "Enter JSON to convert to Dart model",
+                placeHolder: "Paste JSON here",
+            });
+            if (!jsonInput) {
+                vscode.window.showErrorMessage("No JSON input provided.");
+                return;
+            }
+            const className = await vscode.window.showInputBox({
+                prompt: "Enter the class name for the Dart model",
+                placeHolder: "Example: WeatherDataModel",
+            });
+            if (!className) {
+                vscode.window.showErrorMessage("Class name is required.");
+                return;
+            }
+            const dartModel = generate(jsonInput, className);
+            if (!dartModel) {
+                vscode.window.showErrorMessage("Error generating Dart model.");
+                return;
+            }
+            saveAndOpenFile(className, dartModel);
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`Error: ${error}`);
+        }
+    });
+    context.subscriptions.push(jsonToDartCommand);
+    // Register JSON to Dart command (using quicktype)
+    const quicktypeCommand = vscode.commands.registerCommand("extension.jsonToDart", async () => {
+        const jsonInput = await vscode.window.showInputBox({
+            prompt: "Enter JSON data",
+            placeHolder: '{ "name": "John", "age": 30 }',
+        });
+        if (!jsonInput) {
+            return;
+        }
+        const className = await vscode.window.showInputBox({
+            prompt: "Enter Dart class name",
+            placeHolder: "AppUserDataModel",
+        });
+        if (!className) {
+            return;
+        }
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage("No workspace folder found.");
+            return;
+        }
+        const fileName = convertClassNameToFilename(className) + ".dart";
+        const outputPath = path.join(workspaceFolder, "lib/models", fileName);
+        const tempJsonPath = path.join(workspaceFolder, "temp.json");
+        fs.writeFileSync(tempJsonPath, jsonInput);
+        const modelsDir = path.join(workspaceFolder, "lib/models");
+        // Ensure the models directory exists
+        if (!fs.existsSync(modelsDir)) {
+            fs.mkdirSync(modelsDir, { recursive: true });
+        }
+        //Command for generating Dart model from provided JSON
+        const command = `quicktype --lang dart --src ${tempJsonPath} --use-json-annotation --out ${outputPath}`;
+        (0, child_process_1.exec)(command, (error, stdout, stderr) => {
+            if (error) {
+                vscode.window.showErrorMessage(`Error: ${stderr}`);
+                return;
+            }
+            vscode.window.showInformationMessage(`Dart model saved: ${outputPath}`);
+            vscode.workspace.openTextDocument(outputPath).then((doc) => {
+                vscode.window.showTextDocument(doc);
+            });
+            fs.unlinkSync(tempJsonPath);
+        });
+    });
+    context.subscriptions.push(quicktypeCommand);
 }
 class WrapWithConsumerProvider {
     provideCodeActions(document, range) {
@@ -80,13 +159,31 @@ class WrapWithConsumerProvider {
         action.command = {
             title: "Wrap with Consumer<T>",
             command: "consumerWrapper.wrapWithConsumer",
-            arguments: [document, range], // Pass range correctly
+            arguments: [document, range],
         };
         return [action];
     }
 }
 function convertToCamelCase(input) {
     return input.charAt(0).toLowerCase() + input.slice(1);
+}
+function convertClassNameToFilename(className) {
+    return className.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
+}
+async function saveAndOpenFile(className, content) {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+        vscode.window.showErrorMessage("No workspace folder found.");
+        return;
+    }
+    const workspacePath = workspaceFolders[0].uri.fsPath;
+    const modelsPath = vscode.Uri.file(`${workspacePath}/lib/models`);
+    const filePath = vscode.Uri.file(`${workspacePath}/lib/models/${convertClassNameToFilename(className)}.dart`);
+    await vscode.workspace.fs.createDirectory(modelsPath);
+    await vscode.workspace.fs.writeFile(filePath, Buffer.from(content, "utf8"));
+    vscode.window.showInformationMessage(`Dart model saved as ${convertClassNameToFilename(className)}.dart`);
+    const document = await vscode.workspace.openTextDocument(filePath);
+    vscode.window.showTextDocument(document);
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

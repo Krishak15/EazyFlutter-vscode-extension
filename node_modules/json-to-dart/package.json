@@ -1,0 +1,22 @@
+{
+  "name": "json-to-dart",
+  "version": "0.1.4",
+  "description": "Generate dart class from json data",
+  "main": "src/index.js",
+  "bin": {
+    "json2dart": "bin/json2dart.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Wenjun.Xiao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wenjunxiao/json-to-dart.git"
+  },
+  "dependencies": {
+    "lcid": "^3.1.1"
+  }
+}
