@@ -123,22 +123,35 @@ function activate(context) {
         if (!className) {
             return;
         }
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-        if (!workspaceFolder) {
-            vscode.window.showErrorMessage("No workspace folder found.");
+        // const workspaceFolder =
+        //   vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        // if (!workspaceFolder) {
+        //   vscode.window.showErrorMessage("No workspace folder found.");
+        //   return;
+        // }
+        if (!vscode.workspace.workspaceFolders ||
+            vscode.workspace.workspaceFolders.length === 0) {
+            vscode.window.showErrorMessage("No workspace folder found. Open a workspace first.");
             return;
         }
+        // const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const workspaceFolder = await getWorkspaceFolder();
         const fileName = convertClassNameToFilename(className) + ".dart";
-        const outputPath = path.join(workspaceFolder, "lib/models", fileName);
-        const tempJsonPath = path.join(workspaceFolder, "temp.json");
-        fs.writeFileSync(tempJsonPath, jsonInput);
         const modelsDir = path.join(workspaceFolder, "lib/models");
         // Ensure the models directory exists
         if (!fs.existsSync(modelsDir)) {
             fs.mkdirSync(modelsDir, { recursive: true });
         }
+        // const outputPath = path.resolve(workspaceFolder, "lib/models", fileName);
+        const outputPath = vscode.Uri.file(path.join(workspaceFolder, "lib/models", fileName)).fsPath;
+        console.log("Resolved Output Path:", outputPath);
+        const tempJsonPath = path.join(workspaceFolder, "temp.json");
+        fs.writeFileSync(tempJsonPath, jsonInput);
+        console.log("Workspace Folder:", workspaceFolder);
+        console.log("Models Path:", outputPath);
+        console.log("Temp JSON Path:", tempJsonPath);
         //Command for generating Dart model from provided JSON
-        const command = `quicktype --lang dart --src ${tempJsonPath} --use-json-annotation --out ${outputPath}`;
+        const command = `quicktype --lang dart --src "${tempJsonPath}" --use-json-annotation --out "${outputPath}"`;
         (0, child_process_1.exec)(command, (error, stdout, stderr) => {
             if (error) {
                 vscode.window.showErrorMessage(`Error: ${stderr}`);
@@ -164,6 +177,26 @@ class WrapWithConsumerProvider {
         return [action];
     }
 }
+async function getWorkspaceFolder() {
+    if (vscode.workspace.workspaceFolders) {
+        return vscode.workspace.workspaceFolders[0].uri.fsPath;
+    }
+    else {
+        const folderUri = await vscode.window.showOpenDialog({
+            canSelectFolders: true,
+            canSelectMany: false,
+            openLabel: "Select Workspace Folder",
+        });
+        return folderUri ? folderUri[0].fsPath : "";
+    }
+}
+getWorkspaceFolder().then((workspacePath) => {
+    if (!workspacePath) {
+        vscode.window.showErrorMessage("No workspace selected!");
+        return;
+    }
+    console.log("Workspace Path:", workspacePath);
+});
 function convertToCamelCase(input) {
     return input.charAt(0).toLowerCase() + input.slice(1);
 }
