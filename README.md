@@ -97,21 +97,6 @@ class UserModel {
 
 This extension currently does not require any additional settings.
 
-## Known Issues
-
-- None reported yet. If you find any issues, please report them in the repository.
-
-## Release Notes
-
-### 1.1.0
-- Added **JSON to Dart** feature with automatic file generation.
-- Improved workspace folder detection for better file handling.
-
-### 1.0.0
-- Initial release with **"Wrap with Consumer<T>"** feature.
-- **Quick Fix action** added to wrap widgets with a provider.
-- **Auto camel case conversion** for provider variables.
-
 ## Additional Resources
 
 - [Flutter Consumer Documentation](https://pub.dev/documentation/provider/latest/provider/Consumer-class.html)
