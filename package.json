@@ -29,11 +29,11 @@
     "commands": [
       {
         "command": "consumerWrapper.wrapWithConsumer",
-        "title": "Wrap with Consumer<T>"
+        "title": "EzFlutter: Wrap with Consumer<T>"
       },
       {
         "command": "extension.jsonToDart",
-        "title": "JSON to Dart"
+        "title": "EzFlutter: JSON to Dart"
       }
     ],
     "snippets": [
