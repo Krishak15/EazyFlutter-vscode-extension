@@ -33,7 +33,7 @@
       },
       {
         "command": "extension.jsonToDart",
-        "title": "EzFlutter: JSON to Dart"
+        "title": "EazyFlutter: JSON to Dart"
       }
     ],
     "snippets": [
