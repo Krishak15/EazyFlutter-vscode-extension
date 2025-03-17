@@ -38,8 +38,8 @@ exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const child_process_1 = require("child_process");
 const { generate } = require("json-to-dart");
+const { quicktype, InputData, jsonInputForTargetLanguage, } = require("quicktype-core");
 function activate(context) {
     // Register Wrap with Consumer Quick Fix
     const provider = vscode.languages.registerCodeActionsProvider("dart", new WrapWithConsumerProvider(), {
@@ -150,19 +150,30 @@ function activate(context) {
         console.log("Workspace Folder:", workspaceFolder);
         console.log("Models Path:", outputPath);
         console.log("Temp JSON Path:", tempJsonPath);
-        //Command for generating Dart model from provided JSON
-        const command = `quicktype --lang dart --src "${tempJsonPath}" --use-json-annotation --out "${outputPath}"`;
-        (0, child_process_1.exec)(command, (error, stdout, stderr) => {
-            if (error) {
-                vscode.window.showErrorMessage(`Error: ${stderr}`);
-                return;
-            }
-            vscode.window.showInformationMessage(`Dart model saved: ${outputPath}`);
-            vscode.workspace.openTextDocument(outputPath).then((doc) => {
-                vscode.window.showTextDocument(doc);
-            });
-            fs.unlinkSync(tempJsonPath);
-        });
+        try {
+            await generateDartModel(tempJsonPath, outputPath);
+        }
+        catch (e) {
+            console.log(e);
+        }
+        // const quicktypeCmd = path.resolve(
+        //   __dirname,
+        //   "../node_modules/.bin/quicktype"
+        // );
+        // console.log("Module path:", quicktypeCmd);
+        // //Command for generating Dart model from provided JSON
+        // const command = `${quicktypeCmd} --lang dart --src "${tempJsonPath}" --use-json-annotation --out "${outputPath}"`;
+        // exec(command, (error, stdout, stderr) => {
+        //   if (error) {
+        //     vscode.window.showErrorMessage(`Error: ${stderr}`);
+        //     return;
+        //   }
+        //   vscode.window.showInformationMessage(`Dart model saved: ${outputPath}`);
+        //   vscode.workspace.openTextDocument(outputPath).then((doc) => {
+        //     vscode.window.showTextDocument(doc);
+        //   });
+        //   fs.unlinkSync(tempJsonPath);
+        // });
     });
     context.subscriptions.push(quicktypeCommand);
 }
@@ -175,6 +186,31 @@ class WrapWithConsumerProvider {
             arguments: [document, range],
         };
         return [action];
+    }
+}
+async function generateDartModel(jsonPath, outputPath) {
+    try {
+        // Read JSON content
+        const jsonData = fs.readFileSync(jsonPath, "utf-8");
+        // Configure QuickType
+        const jsonInput = jsonInputForTargetLanguage("dart");
+        await jsonInput.addSource({ name: "GeneratedModel", samples: [jsonData] });
+        const inputData = new InputData();
+        inputData.addInput(jsonInput);
+        const result = await quicktype({
+            inputData,
+            lang: "dart",
+            rendererOptions: {
+                "just-types": false,
+                "use-json-annotation": true,
+            },
+        });
+        // Write to output file
+        fs.writeFileSync(outputPath, result.lines.join("\n"), "utf-8");
+        console.log("✅ Dart model generated successfully:", outputPath);
+    }
+    catch (error) {
+        console.error("❌ Error generating Dart model:", error);
     }
 }
 async function getWorkspaceFolder() {
