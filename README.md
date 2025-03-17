@@ -25,7 +25,7 @@ EazyFlutter is a powerful VS Code extension designed to streamline Flutter devel
 
 ### Wrap a Widget with `Consumer<T>` (Quick Fix)
 
-- Hover over a widget in your Dart file.
+- Select a widget in your Dart file.
 - Press **`Cmd + .`** (Mac) / **`Ctrl + .`** (Windows).
 - Select **"Wrap with Consumer<T>"**.
 - Enter the **Provider Type**, and the extension automatically wraps the widget.
@@ -96,9 +96,9 @@ set name(String value) {
 ### JSON to Dart Conversion
 
 1. Open the command palette (`Cmd + Shift + P` / `Ctrl + Shift + P`).
-2. Search for **"Convert JSON to Dart"**.
+2. Search for **"EazyFlutter: JSON to Dart"**.
 3. Enter your JSON data.
-4. Provide a **class name** for the generated model.
+4. Provide a **Class name** for the generated model.
 5. The extension will:
    - Generate a Dart model with `json_serializable` annotations.
    - Save the file in `lib/models/{class_name}.dart`.
