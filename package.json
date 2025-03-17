@@ -6,17 +6,17 @@
     "name": "Anand Krishna",
     "email": "anand.krishna@mindster.com"
   },
+  "publisher": "Krishak15",
   "icon": "images/icon.png",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "engines": {
     "vscode": "^1.98.0"
   },
   "repository": {
-  "type": "git",
-  "url": "https://github.com/Krishak15/eazyflutter-vscode-extension"
-},
-
+    "type": "git",
+    "url": "https://github.com/Krishak15/eazyflutter-vscode-extension"
+  },
   "categories": [
     "Snippets",
     "Other"
@@ -85,6 +85,7 @@
   "dependencies": {
     "json-to-dart": "^0.1.4",
     "quicktype": "^23.0.171",
+    "quicktype-core": "^23.0.171",
     "remove": "^0.1.5",
     "uninstall": "^0.0.0"
   }
