@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 import { exec } from "child_process";
-const { generate } = require("json-to-dart");
+import { topLevelNameOrder } from "quicktype-core/dist/ConvenienceRenderer";
 const {
   quicktype,
   InputData,
@@ -87,13 +87,13 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
 
-        const dartModel = generate(jsonInput, className);
-        if (!dartModel) {
-          vscode.window.showErrorMessage("Error generating Dart model.");
-          return;
-        }
+        // const dartModel = generate(jsonInput, className);
+        // if (!dartModel) {
+        //   vscode.window.showErrorMessage("Error generating Dart model.");
+        //   return;
+        // }
 
-        saveAndOpenFile(className, dartModel);
+        // saveAndOpenFile(className, dartModel);
       } catch (error) {
         vscode.window.showErrorMessage(`Error: ${error}`);
       }
@@ -163,7 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
       console.log("Temp JSON Path:", tempJsonPath);
 
       try {
-        await generateDartModel(tempJsonPath, outputPath);
+        await generateDartModel(tempJsonPath, className, outputPath);
       } catch (e) {
         console.log(e);
       }
@@ -213,6 +213,7 @@ class WrapWithConsumerProvider implements vscode.CodeActionProvider {
 
 async function generateDartModel(
   jsonPath: string,
+  className: string,
   outputPath: string
 ): Promise<void> {
   try {
@@ -221,7 +222,7 @@ async function generateDartModel(
 
     // Configure QuickType
     const jsonInput = jsonInputForTargetLanguage("dart");
-    await jsonInput.addSource({ name: "GeneratedModel", samples: [jsonData] });
+    await jsonInput.addSource({ name: className, samples: [jsonData] });
 
     const inputData = new InputData();
     inputData.addInput(jsonInput);
@@ -237,9 +238,9 @@ async function generateDartModel(
 
     // Write to output file
     fs.writeFileSync(outputPath, result.lines.join("\n"), "utf-8");
-    console.log("✅ Dart model generated successfully:", outputPath);
+    console.log("Dart model generated successfully:", outputPath);
   } catch (error) {
-    console.error("❌ Error generating Dart model:", error);
+    console.error("Error generating Dart model:", error);
   }
 }
 

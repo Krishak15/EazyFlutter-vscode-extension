@@ -38,7 +38,6 @@ exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const { generate } = require("json-to-dart");
 const { quicktype, InputData, jsonInputForTargetLanguage, } = require("quicktype-core");
 function activate(context) {
     // Register Wrap with Consumer Quick Fix
@@ -95,12 +94,12 @@ function activate(context) {
                 vscode.window.showErrorMessage("Class name is required.");
                 return;
             }
-            const dartModel = generate(jsonInput, className);
-            if (!dartModel) {
-                vscode.window.showErrorMessage("Error generating Dart model.");
-                return;
-            }
-            saveAndOpenFile(className, dartModel);
+            // const dartModel = generate(jsonInput, className);
+            // if (!dartModel) {
+            //   vscode.window.showErrorMessage("Error generating Dart model.");
+            //   return;
+            // }
+            // saveAndOpenFile(className, dartModel);
         }
         catch (error) {
             vscode.window.showErrorMessage(`Error: ${error}`);
@@ -151,7 +150,7 @@ function activate(context) {
         console.log("Models Path:", outputPath);
         console.log("Temp JSON Path:", tempJsonPath);
         try {
-            await generateDartModel(tempJsonPath, outputPath);
+            await generateDartModel(tempJsonPath, className, outputPath);
         }
         catch (e) {
             console.log(e);
@@ -188,13 +187,13 @@ class WrapWithConsumerProvider {
         return [action];
     }
 }
-async function generateDartModel(jsonPath, outputPath) {
+async function generateDartModel(jsonPath, className, outputPath) {
     try {
         // Read JSON content
         const jsonData = fs.readFileSync(jsonPath, "utf-8");
         // Configure QuickType
         const jsonInput = jsonInputForTargetLanguage("dart");
-        await jsonInput.addSource({ name: "GeneratedModel", samples: [jsonData] });
+        await jsonInput.addSource({ name: className, samples: [jsonData] });
         const inputData = new InputData();
         inputData.addInput(jsonInput);
         const result = await quicktype({
@@ -207,10 +206,10 @@ async function generateDartModel(jsonPath, outputPath) {
         });
         // Write to output file
         fs.writeFileSync(outputPath, result.lines.join("\n"), "utf-8");
-        console.log("✅ Dart model generated successfully:", outputPath);
+        console.log("Dart model generated successfully:", outputPath);
     }
     catch (error) {
-        console.error("❌ Error generating Dart model:", error);
+        console.error("Error generating Dart model:", error);
     }
 }
 async function getWorkspaceFolder() {
