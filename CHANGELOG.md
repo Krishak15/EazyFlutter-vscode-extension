@@ -1,9 +1,23 @@
-# Change Log
+# Changelog
 
-All notable changes to the "eazyflutter" extension will be documented in this file.
+All notable changes to this project will be documented here.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.3] - 2025-03-18
+### Fixed
+- Fixed JSON to Dart model naming issue.
+- Improved widget detection logic.
+- Code optimization and bug fixes.
 
-## [Unreleased]
+## [1.0.2] - 2025-03-17
+### Changed
+- Code refactoring.
+- General bug fixes.
 
-- Initial release
+## [1.0.1] - 2025-03-17
+### Fixed
+- Fixed JSON to Dart conversion issues.
+- Bug fixes.
+
+## [1.0.0] - 2025-03-17
+### Added
+- Initial release.
