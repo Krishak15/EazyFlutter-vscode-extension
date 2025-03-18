@@ -64,7 +64,10 @@ export function activate(context: vscode.ExtensionContext) {
             },
           )`
         );
+        ensureProviderImport(document);
       });
+
+      // **Ensure `provider.dart` is imported**
     }
   );
 
@@ -92,14 +95,6 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showErrorMessage("Class name is required.");
           return;
         }
-
-        // const dartModel = generate(jsonInput, className);
-        // if (!dartModel) {
-        //   vscode.window.showErrorMessage("Error generating Dart model.");
-        //   return;
-        // }
-
-        // saveAndOpenFile(className, dartModel);
       } catch (error) {
         vscode.window.showErrorMessage(`Error: ${error}`);
       }
@@ -345,6 +340,44 @@ function convertClassNameToFilename(className: string): string {
 
 function containsModel(className: string): boolean {
   return /model/i.test(className); // 'i' makes it case-insensitive
+}
+
+// Ensures `package:provider/provider.dart` is imported at the top.
+
+/**
+ * Ensures `package:provider/provider.dart` is imported at the top.
+ */
+function ensureProviderImport(document: vscode.TextDocument) {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return;
+  }
+
+  const providerImport = `import 'package:provider/provider.dart';`;
+
+  // Check if `provider.dart` is already imported
+  const text = document.getText();
+  if (text.includes(providerImport)) {
+    return; // Already imported, do nothing
+  }
+
+  // Find first non-import line to insert the import
+  const lines = text.split("\n");
+  let insertPosition = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (!lines[i].trim().startsWith("import")) {
+      insertPosition = i;
+      break;
+    }
+  }
+
+  const position = new vscode.Position(insertPosition, 0);
+
+  // Insert the import statement
+  editor.edit((editBuilder) => {
+    editBuilder.insert(position, providerImport + "\n");
+  });
 }
 
 export function deactivate() {}
