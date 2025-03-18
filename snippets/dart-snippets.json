@@ -6,7 +6,7 @@
       "  builder: (context, ${2:provider}, _) {",
       "    return ${3:ChildWidget}();",
       "  },",
-      ")"
+      ");"
     ],
     "description": "Wrap a widget with Consumer<T> where T is any provider"
   },

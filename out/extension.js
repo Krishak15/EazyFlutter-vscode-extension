@@ -52,16 +52,19 @@ function activate(context) {
             return;
         }
         let selectedText = editor.document.getText(editor.selection);
-        if (!selectedText && range) {
-            selectedText = document.getText(range);
-        }
         if (!selectedText) {
-            vscode.window.showErrorMessage("No widget selected.");
-            return;
+            const startOffset = document.offsetAt(editor.selection.start);
+            const widgetRange = findFullWidgetRange(document, startOffset);
+            if (!widgetRange) {
+                vscode.window.showErrorMessage("No valid widget selected.");
+                return;
+            }
+            selectedText = document.getText(widgetRange);
+            range = widgetRange;
         }
         // Ask for Provider type
         const providerName = await vscode.window.showInputBox({
-            prompt: "Enter Provider Type (e.g., AppUserManagementProvider)",
+            prompt: "Enter Provider Type (e.g., TestProvider)",
             placeHolder: "ProviderType",
         });
         if (!providerName) {
@@ -69,9 +72,12 @@ function activate(context) {
             return;
         }
         const camelCaseProviderName = convertToCamelCase(providerName);
-        const wrappedText = `Consumer<${providerName}>(\n  builder: (context, ${camelCaseProviderName}, _) {\n    return ${selectedText};\n  },\n)`;
         editor.edit((editBuilder) => {
-            editBuilder.replace(editor.selection.isEmpty ? range : editor.selection, wrappedText);
+            editBuilder.replace(range, `Consumer<${providerName}>(
+            builder: (context, ${camelCaseProviderName}, _) {
+              return ${selectedText};
+            },
+          )`);
         });
     });
     context.subscriptions.push(consumerCommand);
@@ -135,7 +141,14 @@ function activate(context) {
         }
         // const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath;
         const workspaceFolder = await getWorkspaceFolder();
-        const fileName = convertClassNameToFilename(className) + ".dart";
+        const fileNameContainsWordModel = containsModel(className);
+        let fileName = "";
+        if (fileNameContainsWordModel) {
+            fileName = convertClassNameToFilename(className) + ".dart";
+        }
+        else {
+            fileName = convertClassNameToFilename(className + "_model") + ".dart";
+        }
         const modelsDir = path.join(workspaceFolder, "lib/models");
         // Ensure the models directory exists
         if (!fs.existsSync(modelsDir)) {
@@ -144,40 +157,33 @@ function activate(context) {
         // const outputPath = path.resolve(workspaceFolder, "lib/models", fileName);
         const outputPath = vscode.Uri.file(path.join(workspaceFolder, "lib/models", fileName)).fsPath;
         console.log("Resolved Output Path:", outputPath);
-        const tempJsonPath = path.join(workspaceFolder, "temp.json");
+        const tempJsonPath = path.join(workspaceFolder, "eazyflutter_json_temp.json");
         fs.writeFileSync(tempJsonPath, jsonInput);
         console.log("Workspace Folder:", workspaceFolder);
         console.log("Models Path:", outputPath);
         console.log("Temp JSON Path:", tempJsonPath);
         try {
             await generateDartModel(tempJsonPath, className, outputPath);
+            // Delete temporary json after generating model.
+            fs.unlinkSync(tempJsonPath);
         }
         catch (e) {
             console.log(e);
         }
-        // const quicktypeCmd = path.resolve(
-        //   __dirname,
-        //   "../node_modules/.bin/quicktype"
-        // );
-        // console.log("Module path:", quicktypeCmd);
-        // //Command for generating Dart model from provided JSON
-        // const command = `${quicktypeCmd} --lang dart --src "${tempJsonPath}" --use-json-annotation --out "${outputPath}"`;
-        // exec(command, (error, stdout, stderr) => {
-        //   if (error) {
-        //     vscode.window.showErrorMessage(`Error: ${stderr}`);
-        //     return;
-        //   }
-        //   vscode.window.showInformationMessage(`Dart model saved: ${outputPath}`);
-        //   vscode.workspace.openTextDocument(outputPath).then((doc) => {
-        //     vscode.window.showTextDocument(doc);
-        //   });
-        //   fs.unlinkSync(tempJsonPath);
-        // });
     });
     context.subscriptions.push(quicktypeCommand);
 }
 class WrapWithConsumerProvider {
     provideCodeActions(document, range) {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+        const position = editor.selection.start;
+        // Allow wrapping even if cursor is inside widget name
+        if (!isCursorInsideWidget(document, position)) {
+            return;
+        }
         const action = new vscode.CodeAction("Wrap with Consumer<T>", vscode.CodeActionKind.Refactor);
         action.command = {
             title: "Wrap with Consumer<T>",
@@ -187,11 +193,54 @@ class WrapWithConsumerProvider {
         return [action];
     }
 }
+// Detect if cursor is inside a widget name
+function isCursorInsideWidget(document, position) {
+    const line = document.lineAt(position.line).text;
+    const textBeforeCursor = line.substring(0, position.character);
+    const textAfterCursor = line.substring(position.character);
+    // Match a full widget name even if cursor is inside
+    const widgetMatch = textBeforeCursor.match(/\b[A-Z][a-zA-Z0-9_]*$/) ||
+        textAfterCursor.match(/^[A-Z][a-zA-Z0-9_]*/);
+    return !!widgetMatch;
+}
+// Find full widget range to wrap
+function findFullWidgetRange(document, cursorOffset) {
+    const text = document.getText();
+    // Move left to find the start of the widget
+    let startOffset = cursorOffset;
+    while (startOffset > 0 && /\w/.test(text[startOffset - 1])) {
+        startOffset--;
+    }
+    let openBrackets = 0;
+    let endOffset = cursorOffset;
+    let insideString = false;
+    for (let i = startOffset; i < text.length; i++) {
+        const char = text[i];
+        if (char === '"' || char === "'") {
+            insideString = !insideString;
+        }
+        if (!insideString) {
+            if (char === "(") {
+                openBrackets++;
+            }
+            if (char === ")") {
+                openBrackets--;
+            }
+        }
+        if (openBrackets === 0 && char === ")") {
+            endOffset = i + 1;
+            break;
+        }
+    }
+    if (openBrackets !== 0) {
+        return undefined;
+    }
+    return new vscode.Range(document.positionAt(startOffset), document.positionAt(endOffset));
+}
+// Generate Dart model from JSON using quicktype
 async function generateDartModel(jsonPath, className, outputPath) {
     try {
-        // Read JSON content
         const jsonData = fs.readFileSync(jsonPath, "utf-8");
-        // Configure QuickType
         const jsonInput = jsonInputForTargetLanguage("dart");
         await jsonInput.addSource({ name: className, samples: [jsonData] });
         const inputData = new InputData();
@@ -204,14 +253,13 @@ async function generateDartModel(jsonPath, className, outputPath) {
                 "use-json-annotation": true,
             },
         });
-        // Write to output file
         fs.writeFileSync(outputPath, result.lines.join("\n"), "utf-8");
-        console.log("Dart model generated successfully:", outputPath);
     }
     catch (error) {
         console.error("Error generating Dart model:", error);
     }
 }
+// Get workspace folder
 async function getWorkspaceFolder() {
     if (vscode.workspace.workspaceFolders) {
         return vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -225,33 +273,16 @@ async function getWorkspaceFolder() {
         return folderUri ? folderUri[0].fsPath : "";
     }
 }
-getWorkspaceFolder().then((workspacePath) => {
-    if (!workspacePath) {
-        vscode.window.showErrorMessage("No workspace selected!");
-        return;
-    }
-    console.log("Workspace Path:", workspacePath);
-});
+// Convert class name to camelCase
 function convertToCamelCase(input) {
     return input.charAt(0).toLowerCase() + input.slice(1);
 }
+// Convert class name to filename format
 function convertClassNameToFilename(className) {
     return className.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
 }
-async function saveAndOpenFile(className, content) {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
-        vscode.window.showErrorMessage("No workspace folder found.");
-        return;
-    }
-    const workspacePath = workspaceFolders[0].uri.fsPath;
-    const modelsPath = vscode.Uri.file(`${workspacePath}/lib/models`);
-    const filePath = vscode.Uri.file(`${workspacePath}/lib/models/${convertClassNameToFilename(className)}.dart`);
-    await vscode.workspace.fs.createDirectory(modelsPath);
-    await vscode.workspace.fs.writeFile(filePath, Buffer.from(content, "utf8"));
-    vscode.window.showInformationMessage(`Dart model saved as ${convertClassNameToFilename(className)}.dart`);
-    const document = await vscode.workspace.openTextDocument(filePath);
-    vscode.window.showTextDocument(document);
+function containsModel(className) {
+    return /model/i.test(className); // 'i' makes it case-insensitive
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map
