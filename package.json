@@ -83,8 +83,6 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "json-to-dart": "^0.1.4",
-    "quicktype": "^23.0.171",
     "quicktype-core": "^23.0.171",
     "remove": "^0.1.5",
     "uninstall": "^0.0.0"
