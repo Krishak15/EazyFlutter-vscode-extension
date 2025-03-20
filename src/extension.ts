@@ -178,6 +178,12 @@ export function activate(context: vscode.ExtensionContext) {
       try {
         await generateDartModel(tempJsonPath, className, outputPath);
 
+        vscode.workspace
+          .openTextDocument(vscode.Uri.file(outputPath))
+          .then((document) => {
+            vscode.window.showTextDocument(document);
+          });
+
         // Delete temporary json after generating model.
         fs.unlinkSync(tempJsonPath);
       } catch (e) {
@@ -344,9 +350,6 @@ function containsModel(className: string): boolean {
 
 // Ensures `package:provider/provider.dart` is imported at the top.
 
-/**
- * Ensures `package:provider/provider.dart` is imported at the top.
- */
 function ensureProviderImport(document: vscode.TextDocument) {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {

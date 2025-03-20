@@ -160,6 +160,11 @@ function activate(context) {
         console.log("Temp JSON Path:", tempJsonPath);
         try {
             await generateDartModel(tempJsonPath, className, outputPath);
+            vscode.workspace
+                .openTextDocument(vscode.Uri.file(outputPath))
+                .then((document) => {
+                vscode.window.showTextDocument(document);
+            });
             // Delete temporary json after generating model.
             fs.unlinkSync(tempJsonPath);
         }
@@ -281,9 +286,6 @@ function containsModel(className) {
     return /model/i.test(className); // 'i' makes it case-insensitive
 }
 // Ensures `package:provider/provider.dart` is imported at the top.
-/**
- * Ensures `package:provider/provider.dart` is imported at the top.
- */
 function ensureProviderImport(document) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
