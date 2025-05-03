@@ -71,37 +71,57 @@ function registerCommandForConsumerQuickAction({ context, convertToCamelCase, })
                   return ${selectedText};
                 },
               )`);
-            ensureProviderImport(document);
+            const insertPosition = getProviderImportInsertPosition(document);
+            if (insertPosition) {
+                editBuilder.insert(insertPosition, `import 'package:provider/provider.dart';\n`);
+            }
         });
         // **Ensure `provider.dart` is imported**
     });
     context.subscriptions.push(consumerCommand);
 }
-// Ensures `package:provider/provider.dart` is imported at the top.
-function ensureProviderImport(document) {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        return;
-    }
-    const providerImport = `import 'package:provider/provider.dart';`;
-    // Check if `provider.dart` is already imported
+/// [getProviderImportInsertPosition] Ensures `package:provider/provider.dart` is imported at the top.
+function getProviderImportInsertPosition(document) {
     const text = document.getText();
+    const providerImport = `import 'package:provider/provider.dart';`;
+    // If already imported, do nothing
     if (text.includes(providerImport)) {
-        return; // Already imported, do nothing
+        return null;
     }
-    // Find first non-import line to insert the import
     const lines = text.split("\n");
-    let insertPosition = 0;
     for (let i = 0; i < lines.length; i++) {
         if (!lines[i].trim().startsWith("import")) {
-            insertPosition = i;
-            break;
+            return new vscode.Position(i, 0);
         }
     }
-    const position = new vscode.Position(insertPosition, 0);
-    // Insert the import statement
-    editor.edit((editBuilder) => {
-        editBuilder.insert(position, providerImport + "\n");
-    });
+    // Fallback: append to top
+    return new vscode.Position(0, 0);
 }
+// // Ensures `package:provider/provider.dart` is imported at the top.
+// function ensureProviderImport(document: vscode.TextDocument) {
+//   const editor = vscode.window.activeTextEditor;
+//   if (!editor) {
+//     return;
+//   }
+//   const providerImport = `import 'package:provider/provider.dart';`;
+//   // Check if `provider.dart` is already imported
+//   const text = document.getText();
+//   if (text.includes(providerImport)) {
+//     return; // Already imported, do nothing
+//   }
+//   // Find first non-import line to insert the import
+//   const lines = text.split("\n");
+//   let insertPosition = 0;
+//   for (let i = 0; i < lines.length; i++) {
+//     if (!lines[i].trim().startsWith("import")) {
+//       insertPosition = i;
+//       break;
+//     }
+//   }
+//   const position = new vscode.Position(insertPosition, 0);
+//   // Insert the import statement
+//   editor.edit((editBuilder) => {
+//     editBuilder.insert(position, providerImport + "\n");
+//   });
+// }
 //# sourceMappingURL=command_consumer.js.map
