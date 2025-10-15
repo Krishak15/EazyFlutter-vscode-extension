@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented here.
 
+## [1.0.5] - 2025-05-04
+
+### Bug fixes 
+
 ## [1.0.4] - 2025-03-20
 
 ### Minor changes
