@@ -4,6 +4,70 @@ EazyFlutter is a powerful VS Code extension designed to streamline Flutter devel
 
 ## Features
 
+### Localization Quick Fix (l10n)
+
+#### Add Strings to .arb Localization Files
+
+EazyFlutter makes it easy to manage your Flutter localization workflow:
+
+1. **Select a String**: Highlight any string literal in your Dart code that you want to localize.
+2. **Trigger the Quick Fix**: Press **Cmd+.** (Mac) or **Ctrl+.** (Windows/Linux) to open the light bulb menu, then select **"Add to .arb localization files"**.
+3. **Automatic Key Generation**: The extension generates a camelCase key from your string (e.g., `"This is a sample"` → `thisIsASample`).
+4. **.arb File Management**:
+   - If English .arb file(s) exist (e.g., `app_en.arb`, `english.arb`, `en.arb`), the key and value are added there:  
+     `"thisIsASample": "This is a sample"`
+   - In other .arb files, the key is added with an empty value:  
+     `"thisIsASample": ""`
+   - If no .arb files exist, a `lib/l10n/app_en.arb` file is created automatically.
+5. **Code Replacement**: The selected string in your Dart code is replaced with the generated key, optionally prefixed (see below).
+6. **l10n Generation (Optional)**: If enabled, the extension will automatically run the correct localization generation command after updating .arb files (see below).
+
+#### Example Workflow
+
+Suppose you have this code:
+
+```dart
+Text('You have reached your contact view limit')
+```
+
+After using the Quick Fix, your `app_en.arb` will have:
+
+```json
+{
+  "youHaveReachedYourContactViewLimit": "You have reached your contact view limit"
+}
+```
+
+And your Dart code will be updated to:
+
+```dart
+Text(AppLocalizations.of(context).youHaveReachedYourContactViewLimit)
+```
+
+_(Prefix is configurable, see below)_
+
+#### Configuration Options
+
+- **Localization Key Prefix**: In VS Code settings, search for `EazyFlutter: Localization Key Prefix`. Set this to the prefix you want before the key in your code (e.g., `AppLocalizations.of(context).` or `Localizations.locale.`). Leave blank for just the key.
+
+- **Auto L10n Generate**: Enable `EazyFlutter: Auto L10n Generate` to automatically run the correct localization generation command after .arb updates:
+  - If your project uses FVM (detected by a `fvm` or `.fvm` directory), the extension runs:
+    ```sh
+    fvm flutter gen-l10n
+    ```
+  - Otherwise, it runs:
+    ```sh
+    flutter gen-l10n
+    ```
+  - The command is executed in a new VS Code terminal named "EazyFlutter l10n".
+
+#### Why Use This?
+
+- **No more manual .arb editing**: Add and sync translations with a single action.
+- **Consistent key naming**: Keys are generated in camelCase from your strings.
+- **Flexible code integration**: Use any localization prefix pattern your project requires.
+- **Automated l10n workflow**: Keep your generated Dart localization files up to date with zero hassle.
+
 ### Commands
 
 - **JSON to Dart Conversion** - Convert JSON input into a structured Dart model with `json_serializable`, automatically saving it in the model folder (You can move it to your desired directory after).
@@ -138,7 +202,10 @@ class UserModel {
 
 ## Extension Settings
 
-Currently, no additional configuration is required.
+### Localization Settings
+
+- **Localization Key Prefix**: Configure a prefix to use before the key when replacing in code (e.g., `Applocalization.locale.`).
+- **Auto L10n Generate**: Enable to automatically run the correct localization generation command after .arb updates. The extension detects FVM and uses `fvm flutter gen-l10n` if available, otherwise `flutter gen-l10n`.
 
 ## Additional Resources
 

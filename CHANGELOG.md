@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented here.
 
+## [1.0.8] - 2025-10-19
+
+### Added
+
+- Major localization workflow improvements:
+  - Quick Fix to add selected strings to .arb localization files with automatic camelCase key generation.
+  - Adds value to English .arb files, empty value to other .arb files.
+  - Replaces the selected string in code with the generated key, using a configurable prefix.
+  - Automatically creates a l10n/app_en.arb if none exists.
+  - New configuration: `eazyflutter.localizationKeyPrefix` to set a prefix before the key in code.
+  - New configuration: `eazyflutter.autoL10nGenerate` to auto-run `flutter gen-l10n` or `fvm flutter gen-l10n` after .arb updates, with FVM detection.
+
+### Fixed
+
+- Improved FVM detection and command execution for localization generation.
+
 ## [1.0.7]
 
 - Fixed version mismatch that caused some functions to not work.
@@ -14,7 +30,7 @@ All notable changes to this project will be documented here.
 
 ## [1.0.5] - 2025-05-04
 
-- Bug fixes 
+- Bug fixes
 
 ## [1.0.4] - 2025-03-20
 

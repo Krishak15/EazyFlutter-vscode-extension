@@ -70,6 +70,11 @@ class AddToArbProvider {
 }
 exports.AddToArbProvider = AddToArbProvider;
 function registerCommandForAddToArb(context) {
+    // Detect FVM usage
+    function usesFvm(projectPath) {
+        return (fs.existsSync(path.join(projectPath, "fvm")) ||
+            fs.existsSync(path.join(projectPath, ".fvm")));
+    }
     const disposable = vscode.commands.registerCommand("eazyflutter.addToArb", async (selectedText) => {
         const workspaceFolder = await (0, workspace_management_1.getWorkspaceFolder)();
         if (!workspaceFolder) {
@@ -131,14 +136,28 @@ function registerCommandForAddToArb(context) {
             json[key] = "";
             fs.writeFileSync(arb, JSON.stringify(json, null, 2));
         }
-        // Replace selected string in code with the key
+        // Replace selected string in code with the configured prefix + key
         const editor = vscode.window.activeTextEditor;
         if (editor && !editor.selection.isEmpty) {
+            const config = vscode.workspace.getConfiguration("eazyflutter");
+            const prefix = config.get("localizationKeyPrefix") || "";
             await editor.edit((editBuilder) => {
-                editBuilder.replace(editor.selection, key);
+                editBuilder.replace(editor.selection, `${prefix}${key}`);
             });
         }
         vscode.window.showInformationMessage(`Added "${selectedText}" to localization files as "${key}" and replaced in code.`);
+        // Auto run l10n generate if enabled
+        const config = vscode.workspace.getConfiguration("eazyflutter");
+        const autoL10n = config.get("autoL10nGenerate");
+        if (autoL10n) {
+            const useFvm = usesFvm(workspaceFolder);
+            const l10nCmd = useFvm ? "fvm flutter gen-l10n" : "flutter gen-l10n";
+            const terminal = vscode.window.createTerminal({
+                name: "EazyFlutter l10n",
+            });
+            terminal.sendText(l10nCmd);
+            terminal.show();
+        }
     });
     context.subscriptions.push(disposable);
 }

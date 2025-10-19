@@ -8,7 +8,7 @@
   },
   "publisher": "Krishak15",
   "icon": "images/icon.png",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "MIT",
   "engines": {
     "vscode": "^1.105.0"
@@ -26,6 +26,22 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "EazyFlutter Configuration",
+      "properties": {
+        "eazyflutter.localizationKeyPrefix": {
+          "type": "string",
+          "default": "",
+          "description": "Prefix to use before localization key when replacing in code (e.g. Applocalization.locale. or Localizations.locale.)"
+        },
+        "eazyflutter.autoL10nGenerate": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically run 'flutter gen-l10n' or 'fvm flutter gen-l10n' after updating .arb files."
+        }
+      }
+    },
     "commands": [
       {
         "command": "consumerWrapper.wrapWithConsumer",
