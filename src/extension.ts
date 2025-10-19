@@ -3,6 +3,10 @@ import { getWorkspaceFolder } from "./helpers/workspace_management";
 import { registerCommandForConsumerQuickAction } from "./commands/command_consumer";
 import { registerCommandForJsonConversion } from "./commands/command_json_conversion";
 import { WrapWithConsumerProvider } from "./actions/action_wrap_with_consumer";
+import {
+  AddToArbProvider,
+  registerCommandForAddToArb,
+} from "./actions/action_add_to_arb";
 
 export function activate(context: vscode.ExtensionContext) {
   // Register Wrap with Consumer Quick Fix
@@ -14,6 +18,18 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(provider);
+
+  // Register Add to .arb Quick Fix
+  const addToArbProvider = vscode.languages.registerCodeActionsProvider(
+    "dart",
+    new AddToArbProvider(),
+    {
+      providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
+    }
+  );
+  context.subscriptions.push(addToArbProvider);
+
+  registerCommandForAddToArb(context);
 
   /// [registerCommandForConsumerQuickAction] registers the command for wrapping with Consumer
   registerCommandForConsumerQuickAction({

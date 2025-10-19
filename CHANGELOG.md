@@ -2,9 +2,19 @@
 
 All notable changes to this project will be documented here.
 
+## [1.0.7]
+
+- Fixed version mismatch that caused some functions to not work.
+
+## [1.0.6] - 2025-10-16
+
+### Added
+
+- Quick Fix: Add selected string to .arb localization files with automatic key generation and replacement in code.
+
 ## [1.0.5] - 2025-05-04
 
-### Bug fixes 
+- Bug fixes 
 
 ## [1.0.4] - 2025-03-20
 

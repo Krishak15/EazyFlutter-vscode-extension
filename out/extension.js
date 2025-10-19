@@ -40,12 +40,19 @@ const workspace_management_1 = require("./helpers/workspace_management");
 const command_consumer_1 = require("./commands/command_consumer");
 const command_json_conversion_1 = require("./commands/command_json_conversion");
 const action_wrap_with_consumer_1 = require("./actions/action_wrap_with_consumer");
+const action_add_to_arb_1 = require("./actions/action_add_to_arb");
 function activate(context) {
     // Register Wrap with Consumer Quick Fix
     const provider = vscode.languages.registerCodeActionsProvider("dart", new action_wrap_with_consumer_1.WrapWithConsumerProvider(), {
         providedCodeActionKinds: [vscode.CodeActionKind.Refactor],
     });
     context.subscriptions.push(provider);
+    // Register Add to .arb Quick Fix
+    const addToArbProvider = vscode.languages.registerCodeActionsProvider("dart", new action_add_to_arb_1.AddToArbProvider(), {
+        providedCodeActionKinds: [vscode.CodeActionKind.QuickFix],
+    });
+    context.subscriptions.push(addToArbProvider);
+    (0, action_add_to_arb_1.registerCommandForAddToArb)(context);
     /// [registerCommandForConsumerQuickAction] registers the command for wrapping with Consumer
     (0, command_consumer_1.registerCommandForConsumerQuickAction)({
         context,
