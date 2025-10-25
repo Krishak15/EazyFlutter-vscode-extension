@@ -2,6 +2,10 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import { getWorkspaceFolder } from "../helpers/workspace_management";
+import { stripQuotes } from "../actions/methods/string_methods";
+
+// Reuse a single terminal instance for l10n generation
+let l10nTerminal: vscode.Terminal | undefined;
 
 function toCamelCase(str: string): string {
   return str
@@ -24,10 +28,12 @@ export class AddToArbProvider implements vscode.CodeActionProvider {
     if (!editor) {
       return;
     }
-    const selectedText = editor.document.getText(editor.selection).trim();
-    if (!selectedText || selectedText.length < 2) {
+    const rawSelected = editor.document.getText(editor.selection).trim();
+    const selectedText = stripQuotes(rawSelected);
+    if (!selectedText || selectedText.trim().length < 1) {
       return;
     }
+
     const action = new vscode.CodeAction(
       "Add to .arb localization files",
       vscode.CodeActionKind.QuickFix
@@ -52,6 +58,8 @@ export function registerCommandForAddToArb(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
     "eazyflutter.addToArb",
     async (selectedText: string) => {
+      // Extra safety: strip quotes again in case command was called directly
+      selectedText = stripQuotes(selectedText);
       const workspaceFolder = await getWorkspaceFolder();
       if (!workspaceFolder) {
         vscode.window.showErrorMessage("No workspace folder found.");
@@ -135,11 +143,20 @@ export function registerCommandForAddToArb(context: vscode.ExtensionContext) {
       if (autoL10n) {
         const useFvm = usesFvm(workspaceFolder);
         const l10nCmd = useFvm ? "fvm flutter gen-l10n" : "flutter gen-l10n";
-        const terminal = vscode.window.createTerminal({
-          name: "EazyFlutter l10n",
-        });
-        terminal.sendText(l10nCmd);
-        terminal.show();
+        // Reuse existing terminal if present
+        if (
+          !l10nTerminal ||
+          vscode.window.terminals.indexOf(l10nTerminal) === -1
+        ) {
+          const existing = vscode.window.terminals.find(
+            (t) => t.name === "EazyFlutter l10n"
+          );
+          l10nTerminal =
+            existing ??
+            vscode.window.createTerminal({ name: "EazyFlutter l10n" });
+        }
+        l10nTerminal.sendText(l10nCmd);
+        l10nTerminal.show();
       }
     }
   );

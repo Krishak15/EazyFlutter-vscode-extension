@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented here.
 
+## [1.0.9] - 2025-10-19
+
+- Added stripQuotes to sanitize selections & fixed multiple terminal instance when running l10n cmd.
+
 ## [1.0.8] - 2025-10-19
 
 ### Added
