@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Compiled extension output
+out/
+
+# Packaged extension artifacts
+*.vsix
+
+# Test and coverage output
+.vscode-test/
+coverage/
+
+# Local logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db
