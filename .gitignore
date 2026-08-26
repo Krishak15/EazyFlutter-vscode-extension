@@ -3,6 +3,7 @@ node_modules/
 
 # Compiled extension output
 out/
+dist/
 
 # Packaged extension artifacts
 *.vsix

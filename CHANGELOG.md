@@ -13,6 +13,7 @@ All notable changes to this project will be documented here.
 ### Changed
 
 - Added support for older VS Code versions, starting with version `1.97.0`.
+- Bundled the extension for a smaller and more efficient VSIX package.
 
 ## [1.0.9] - 2025-10-19
 
