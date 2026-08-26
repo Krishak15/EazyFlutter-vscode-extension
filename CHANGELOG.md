@@ -10,6 +10,10 @@ All notable changes to this project will be documented here.
 - Automatic snake_case filename and PascalCase class name generation.
 - Keyboard shortcut for the New Dart File command: `Ctrl+K Ctrl+N` on Windows/Linux and `Cmd+K Cmd+N` on macOS.
 
+### Changed
+
+- Added support for older VS Code versions, starting with version `1.97.0`.
+
 ## [1.0.9] - 2025-10-19
 
 - Added stripQuotes to sanitize selections & fixed multiple terminal instance when running l10n cmd.
