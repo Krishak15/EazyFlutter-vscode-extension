@@ -1,6 +1,6 @@
 # EazyFlutter - VS Code Extension for Flutter Development
 
-EazyFlutter is a powerful VS Code extension designed to streamline Flutter development by offering quick actions, intelligent widget wrappers, and useful snippets. This extension simplifies common tasks such as wrapping widgets with `Consumer<T>`, generating getter and setter methods, and converting JSON data into Dart models using `json_serializable`.
+EazyFlutter is a VS Code extension designed to streamline Flutter development with quick actions, file generation, JSON conversion, localization support, and useful Dart snippets. It simplifies common tasks such as wrapping widgets with `Consumer<T>`, generating getter and setter methods, and converting JSON data into Dart models using `json_serializable`.
 
 ## Features
 
@@ -72,6 +72,7 @@ _(Prefix is configurable, see below)_
 
 - **JSON to Dart Conversion** - Convert JSON input into a structured Dart model with `json_serializable`, automatically saving it in the model folder (You can move it to your desired directory after).
 - **Wrap with Consumer<T>** - A quick action is available that wraps widgets with a `Consumer` for Provider-based state management.
+- **New Dart File** - Create a Dart file directly from a folder's Explorer context menu. The command converts names such as `user_profile` or `UserProfile` to a snake_case filename, creates a matching PascalCase class, and opens the new file.
 
 ### Snippets
 
@@ -156,6 +157,19 @@ set name(String value) {
   _name = value;
 }
 ```
+
+### New Dart File
+
+1. Right-click a folder in the VS Code Explorer.
+2. Select **EazyFlutter: New Dart File**.
+3. Enter a file name, with or without the `.dart` extension.
+4. The extension creates the file in the selected folder and opens it. For example, `user_profile` creates `user_profile.dart` containing:
+
+```dart
+class UserProfile {}
+```
+
+The command is also available with **`Ctrl + K`, `Ctrl + N`** on Windows/Linux or **`Cmd + K`, `Cmd + N`** on macOS when the Explorer has focus.
 
 ### JSON to Dart Conversion
 

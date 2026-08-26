@@ -21,9 +21,7 @@
     "Snippets",
     "Other"
   ],
-  "activationEvents": [
-    "onLanguage:dart"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {

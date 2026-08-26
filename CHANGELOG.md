@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## [1.1.0] - 2026-08-26
+
+### Added
+
+- New **Dart File** command for creating a Dart file from a folder's Explorer context menu.
+- Automatic snake_case filename and PascalCase class name generation.
+- Keyboard shortcut for the New Dart File command: `Ctrl+K Ctrl+N` on Windows/Linux and `Cmd+K Cmd+N` on macOS.
+
 ## [1.0.9] - 2025-10-19
 
 - Added stripQuotes to sanitize selections & fixed multiple terminal instance when running l10n cmd.
