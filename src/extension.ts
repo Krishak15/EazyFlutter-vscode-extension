@@ -3,6 +3,7 @@ import { getWorkspaceFolder } from "./helpers/workspace_management";
 import { registerCommandForConsumerQuickAction } from "./commands/command_consumer";
 import { registerCommandForJsonConversion } from "./commands/command_json_conversion";
 import { WrapWithConsumerProvider } from "./actions/action_wrap_with_consumer";
+import { registerCommandForNewDartFile } from "./commands/command_new_dart_file";
 import {
   AddToArbProvider,
   registerCommandForAddToArb,
@@ -42,6 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
     context,
     getWorkspaceFolder,
   });
+
+  // Register New Dart File command (from Explorer's right-click context menu)
+  registerCommandForNewDartFile({ context });
 }
 
 // Convert class name to camelCase
@@ -49,4 +53,4 @@ function convertToCamelCase(input: string): string {
   return input.charAt(0).toLowerCase() + input.slice(1);
 }
 
-export function deactivate() {}
+export function deactivate() { }

@@ -4,14 +4,14 @@
   "description": "A VS Code extension that enhances Flutter development with quick actions and snippets.",
   "author": {
     "name": "Anand Krishna",
-    "email": "anand.krishna@mindster.com"
+    "email": "anandevu2@gmail.com"
   },
   "publisher": "Krishak15",
   "icon": "images/icon.png",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.105.0"
+    "vscode": "^1.134.0"
   },
   "repository": {
     "type": "git",
@@ -50,35 +50,55 @@
       {
         "command": "extension.jsonToDart",
         "title": "EazyFlutter: JSON to Dart"
+      },
+      {
+        "command": "eazyflutter.newDartFile",
+        "title": "EazyFlutter: New Dart File"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "eazyflutter.newDartFile",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation@1"
+        }
+      ]
+    },
     "snippets": [
       {
         "language": "dart",
         "path": "./snippets/dart-snippets.json"
       }
+    ],
+    "codeActions": [
+      {
+        "language": "dart",
+        "title": "Wrap with Consumer<T>",
+        "command": "consumerWrapper.wrapWithConsumer"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "consumerWrapper.wrapWithConsumer",
+        "key": "Ctrl+.",
+        "mac": "Cmd+.",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "eazyflutter.newDartFile",
+        "key": "Ctrl+K Ctrl+N",
+        "mac": "Cmd+K Cmd+N",
+        "when": "explorerViewletFocus"
+      }
+    ],
+    "languages": [
+      {
+        "id": "dart",
+        "configuration": "./language-configuration.json"
+      }
     ]
   },
-  "codeActions": [
-    {
-      "language": "dart",
-      "title": "Wrap with Consumer<T>",
-      "command": "consumerWrapper.wrapWithConsumer"
-    }
-  ],
-  "keybindings": [
-    {
-      "command": "consumerWrapper.wrapWithConsumer",
-      "key": "cmd+.",
-      "when": "editorTextFocus"
-    }
-  ],
-  "languages": [
-    {
-      "language": "dart",
-      "configuration": "./language-configuration.json"
-    }
-  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -89,17 +109,21 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
-    "@types/vscode": "^1.98.0",
-    "@typescript-eslint/eslint-plugin": "^8.25.0",
-    "@typescript-eslint/parser": "^8.25.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.21.0",
-    "typescript": "^5.7.3"
+    "@types/node": "26.x",
+    "@types/vscode": "^1.134.0",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
+    "@typescript-eslint/parser": "^8.68.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
+    "eslint": "^10.9.1",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "diff": "^8.0.3",
+    "serialize-javascript": "^7.0.3"
   },
   "dependencies": {
-    "quicktype-core": "^23.0.171",
+    "quicktype-core": "^26.0.0",
     "remove": "^0.1.5",
     "uninstall": "^0.0.0"
   }
