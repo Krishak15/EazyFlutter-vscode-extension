@@ -12,12 +12,14 @@ export function registerCommandForConsumerQuickAction({
   // Command for wrapping with Consumer
   const consumerCommand = vscode.commands.registerCommand(
     "consumerWrapper.wrapWithConsumer",
-    async (document: vscode.TextDocument, range: vscode.Range) => {
+    async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
 
+      const document = editor.document;
+      let range: vscode.Range = editor.selection;
       let selectedText = editor.document.getText(editor.selection);
       if (!selectedText) {
         const startOffset = document.offsetAt(editor.selection.start);
@@ -45,7 +47,7 @@ export function registerCommandForConsumerQuickAction({
 
       const camelCaseProviderName = convertToCamelCase(providerName);
 
-      editor.edit((editBuilder) => {
+      await editor.edit((editBuilder) => {
         editBuilder.replace(
           range,
           `Consumer<${providerName}>(

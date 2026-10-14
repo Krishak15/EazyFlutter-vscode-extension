@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented here.
 
+## [Unreleased]
+
+### Changed
+
+- Minify the production bundle to reduce the extension package size.
+
+## [1.1.2] - 2026-10-13
+
+### Fixed
+
+- Removed the `Ctrl+.` / `Cmd+.` keybinding override so VS Code's standard code-action shortcut remains available.
+- Fixed the **Wrap with Consumer<T>** command so it uses the active editor when invoked without code-action arguments.
+
+## [1.1.1] - 2026-08-26
+
+### Changed
+
+- Repackaged the extension with the bundled build and support for VS Code `1.97.0` and newer.
+- Bundled the extension for a smaller and more efficient VSIX package.
+
 ## [1.1.0] - 2026-08-26
 
 ### Added
@@ -9,11 +29,6 @@ All notable changes to this project will be documented here.
 - New **Dart File** command for creating a Dart file from a folder's Explorer context menu.
 - Automatic snake_case filename and PascalCase class name generation.
 - Keyboard shortcut for the New Dart File command: `Ctrl+K Ctrl+N` on Windows/Linux and `Cmd+K Cmd+N` on macOS.
-
-### Changed
-
-- Added support for older VS Code versions, starting with version `1.97.0`.
-- Bundled the extension for a smaller and more efficient VSIX package.
 
 ## [1.0.9] - 2025-10-19
 

@@ -8,7 +8,7 @@
   },
   "publisher": "Krishak15",
   "icon": "images/icon.png",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "license": "MIT",
   "engines": {
     "vscode": "^1.97.0"
@@ -78,12 +78,6 @@
     ],
     "keybindings": [
       {
-        "command": "consumerWrapper.wrapWithConsumer",
-        "key": "Ctrl+.",
-        "mac": "Cmd+.",
-        "when": "editorTextFocus"
-      },
-      {
         "command": "eazyflutter.newDartFile",
         "key": "Ctrl+K Ctrl+N",
         "mac": "Cmd+K Cmd+N",
@@ -99,7 +93,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run bundle",
-    "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --outfile=dist/extension.js",
+    "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node16 --external:vscode --minify --outfile=dist/extension.js",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",

@@ -11,7 +11,7 @@ EazyFlutter is a VS Code extension designed to streamline Flutter development wi
 EazyFlutter makes it easy to manage your Flutter localization workflow:
 
 1. **Select a String**: Highlight any string literal in your Dart code that you want to localize.
-2. **Trigger the Quick Fix**: Press **Cmd+.** (Mac) or **Ctrl+.** (Windows/Linux) to open the light bulb menu, then select **"Add to .arb localization files"**.
+2. **Trigger the Quick Fix**: Open the light bulb menu with VS Code's standard **Cmd+.** (Mac) or **Ctrl+.** (Windows/Linux) shortcut, then select **"Add to .arb localization files"**. EazyFlutter does not override this shortcut.
 3. **Automatic Key Generation**: The extension generates a camelCase key from your string (e.g., `"This is a sample"` → `thisIsASample`).
 4. **.arb File Management**:
    - If English .arb file(s) exist (e.g., `app_en.arb`, `english.arb`, `en.arb`), the key and value are added there:  
@@ -91,7 +91,7 @@ _(Prefix is configurable, see below)_
 ### Wrap a Widget with `Consumer<T>` (Quick Fix)
 
 - Select a widget in your Dart file.
-- Press **`Cmd + .`** (Mac) / **`Ctrl + .`** (Windows).
+- Open VS Code's light bulb menu with **`Cmd + .`** (Mac) / **`Ctrl + .`** (Windows).
 - Select **"Wrap with Consumer<T>"**.
 - Enter the **Provider Type**, and the extension automatically wraps the widget.
 
